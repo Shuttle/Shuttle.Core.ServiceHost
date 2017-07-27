@@ -1,6 +1,6 @@
 ﻿namespace Shuttle.Core.ServiceHost
 {
-    public interface IStoppable
+    public interface IServiceHostStop
     {
         void Stop();
     }

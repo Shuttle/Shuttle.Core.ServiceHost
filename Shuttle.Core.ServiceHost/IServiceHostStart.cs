@@ -1,6 +1,6 @@
 ﻿namespace Shuttle.Core.ServiceHost
 {
-    public interface IService
+    public interface IServiceHostStart
     {
         void Start();
     }

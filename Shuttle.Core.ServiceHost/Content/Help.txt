@@ -1,0 +1,57 @@
+﻿Shuttle Service Host
+
+USAGE:
+	{console}.exe 
+		[/install [/serviceName]]	
+			- install the service
+			
+		[/displayName]				
+			- friendly name for the installed service
+			
+		[/description]				
+			- Description for the service
+			
+		[/instance]					
+			- unique name of the instance you wish to install
+			
+		[/startManually]			
+			- specifies that the service should start manually
+			
+		[/username]					
+			- username of the account to use for the service
+			
+		[/password]]				
+			- password of the account to use for the service
+			
+		- or -
+		
+		[/uninstall [/serviceName] [/instance]]							
+
+OVERVIEW:
+
+- Service Name -
+If no /serviceName is specified the full name of the console application will be used along with its version number.
+e.g.:
+
+	Shuttle.Application.Server.Host (1.0.0.0)
+
+- Display Name -	
+The default for the /displayName is the same value as /serviceName.
+
+- Uninstall -
+If you set the /serviceName and/or /instance during installation you will need 
+to specify them when uninstalling them as well, e.g.:
+
+	Shuttle.Core.Host.exe 
+		/uninstall 
+		/serviceName:"Shuttle.Application.Server" 
+		/instance:"Instance5"
+	
+- EXAMPLE -
+Shuttle.Core.Host.exe 
+	/install 
+	/serviceName:"Shuttle.Application.Server" 
+	/displayName:"Shuttle server for the application"
+	/description:"Service to handle messages relating to the application" 
+	/username:"domain\hostuser"
+	/password:"p@ssw0rd!"

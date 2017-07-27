@@ -9,22 +9,19 @@ namespace Shuttle.Core.ServiceHost
 {
     public sealed class ServiceHost : ServiceBase
     {
-        private readonly HostServiceConfiguration _hostServiceConfiguration;
-        private readonly HostEventLog _log;
-        private readonly IService _service;
+        private readonly ServiceHostEventLog _log;
+        private readonly IServiceHostStart _service;
 
-        private ServiceHost(IService service)
+        private ServiceHost(IServiceHostStart service, ServiceConfigurator configurator)
         {
             Guard.AgainstNull(service, nameof(service));
+            Guard.AgainstNull(configurator, nameof(configurator));
 
             _service = service;
-            Guard.AgainstNull(hostServiceConfiguration, "hostServiceConfiguration");
 
-            _hostServiceConfiguration = hostServiceConfiguration;
+            ServiceName = configurator.ServiceName;
 
-            ServiceName = hostServiceConfiguration.ServiceName;
-
-            _log = new HostEventLog(ServiceName);
+            _log = new ServiceHostEventLog(ServiceName);
 
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
         }
@@ -49,7 +46,7 @@ namespace Shuttle.Core.ServiceHost
         {
             _log.WrinteEntry(string.Format("[stopping] : service name = '{0}'", ServiceName));
 
-            var stoppable = _service as IStoppable;
+            var stoppable = _service as IServiceHostStop;
 
             stoppable?.Stop();
 
@@ -60,32 +57,54 @@ namespace Shuttle.Core.ServiceHost
             _log.WrinteEntry(string.Format("[stopped] : service name = '{0}'", ServiceName));
         }
 
-        public void Execute<T>() where T : IService, new ()
+        public void Execute<T>() where T : IServiceHostStart, new()
         {
-            Execute(new T());
+            Execute(new T(), null);
         }
 
-        public void Execute(IService service)
+        public void Execute<T>(Action<ServiceConfigurator> configure) where T : IServiceHostStart, new ()
+        {
+            Execute(new T(), configure);
+        }
+
+        public void Execute(IServiceHostStart service)
+        {
+            Execute(service, null);
+        }
+
+        public void Execute(IServiceHostStart service, Action<ServiceConfigurator> configure)
         {
             Guard.AgainstNull(service, nameof(service));
 
-            if (new CommandProcessor().Execute())
+            var configurator = new ServiceConfigurator();
+
+            configure?.Invoke(configurator);
+
+            if (new CommandProcessor().Execute(configurator))
             {
                 return;
             }
 
-            if (!Environment.UserInteractive)
+            try
             {
-                Run(new ServiceBase[]
+                if (!Environment.UserInteractive)
                 {
-                    new ServiceHost(service)
-                });
-            }
-            else
-            {
-                Console.CursorVisible = false;
+                    Run(new ServiceBase[]
+                    {
+                        new ServiceHost(service, configurator)
+                    });
+                }
+                else
+                {
+                    Console.CursorVisible = false;
 
-                new ConsoleService(service).Execute();
+                    new ConsoleService(service, configurator).Execute();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
             }
         }
     }
