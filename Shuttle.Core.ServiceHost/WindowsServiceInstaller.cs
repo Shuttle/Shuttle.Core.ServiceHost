@@ -3,6 +3,7 @@ using System.Collections;
 using System.Configuration.Install;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Security;
 using System.Security.Principal;
@@ -13,26 +14,46 @@ namespace Shuttle.Core.ServiceHost
 {
     public class WindowsServiceInstaller : MarshalByRefObject
     {
-        public static readonly string ServiceConfiguratorKey = "__ServiceConfiguratorKey__";
+        public static readonly string ServiceConfigurationKey = "__ServiceConfigurationKey__";
 
-        public void Install(IServiceConfigurator configurator)
+        public void Install(IServiceConfiguration configuration)
         {
-            Guard.AgainstNull(configurator, nameof(configurator));
+            Guard.AgainstNull(configuration, nameof(configuration));
 
             GuardAdministrator();
 
-            if (!string.IsNullOrEmpty(configurator.ServiceAssemblyPath))
+            if (!string.IsNullOrEmpty(configuration.ServicePath))
             {
-                InstallRemoteService(configurator);
+                new ServiceInvoker(configuration).Execute(ServiceCommand.Install);
 
                 return;
             }
 
-            var log = ServiceHostEventLog.GetEventLog(configurator.InstancedServiceName());
+            CallContext.LogicalSetData(ServiceConfigurationKey, configuration);
 
-            CallContext.LogicalSetData(ServiceConfiguratorKey, configurator);
+            var instancedServiceName = configuration.GetInstancedServiceName();
+            var log = ServiceHostEventLog.GetEventLog(instancedServiceName);
 
-            ColoredConsole.WriteLine(ConsoleColor.Green, "Installing service '{0}'.", configurator.InstancedServiceName());
+            ColoredConsole.WriteLine(ConsoleColor.Green, "Installing service '{0}'.", instancedServiceName);
+
+            var entryAssembly = Assembly.GetEntryAssembly();
+
+            if (entryAssembly == null)
+            {
+                throw new InvalidOperationException("An entry assembly is required in order to install a service.");
+            }
+
+            var entryAssemblyLocation = entryAssembly.Location;
+
+            if (string.IsNullOrEmpty(entryAssemblyLocation))
+            {
+                throw new InvalidOperationException("The entry assembly has no location.");
+            }
+
+            if (!Path.GetExtension(entryAssemblyLocation).Equals(".exe", StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new InvalidOperationException("The entry assembly must be an 'exe' in order to install as a service.");
+            }
 
             var assemblyInstaller = new AssemblyInstaller(typeof(ServiceHost).Assembly, null);
 
@@ -47,16 +68,16 @@ namespace Shuttle.Core.ServiceHost
                     installer.Install(state);
                     installer.Commit(state);
 
-                    var serviceKey = GetServiceKey(configurator.InstancedServiceName());
+                    var serviceKey = GetServiceKey(instancedServiceName);
 
-                    serviceKey.SetValue("Description", configurator.Description);
+                    serviceKey.SetValue("Description", configuration.Description);
                     serviceKey.SetValue("ImagePath",
                         string.Format("{0} /serviceName:\"{1}\"{2}",
-                            serviceKey.GetValue("ImagePath"),
-                            configurator.ServiceName,
-                            string.IsNullOrEmpty(configurator.Instance)
+                            entryAssemblyLocation,
+                            configuration.ServiceName,
+                            string.IsNullOrEmpty(configuration.Instance)
                                 ? string.Empty
-                                : string.Format(" /instance:\"{0}\"", configurator.Instance)));
+                                : string.Format(" /instance:\"{0}\"", configuration.Instance)));
                 }
                 catch (Exception ex)
                 {
@@ -74,7 +95,7 @@ namespace Shuttle.Core.ServiceHost
                     throw;
                 }
 
-                var message = string.Format("Service '{0}' has been successfully installed.", configurator.InstancedServiceName());
+                var message = string.Format("Service '{0}' has been successfully installed.", instancedServiceName);
 
                 log.WriteEntry(message);
 
@@ -111,105 +132,25 @@ namespace Shuttle.Core.ServiceHost
                     windowsIdentity.Name));
         }
 
-        private void InstallRemoteService(IServiceConfigurator configurator)
-        {
-            var domain = RemoteDomain(configurator.ServiceAssemblyPath);
-
-            try
-            {
-                var installer =
-                    (WindowsServiceInstaller)
-                        domain.CreateInstanceFromAndUnwrap(configurator.ServiceAssemblyPath,
-                            typeof(WindowsServiceInstaller).FullName);
-
-                throw new NotImplementedException();
-                //var configuration =
-                //    (InstallConfiguration)
-                //        domain.CreateInstanceFromAndUnwrap(configurator.ServiceAssemblyPath,
-                //            typeof(InstallConfiguration).FullName);
-
-                //configuration.ConfigurationFileName = configurator.ConfigurationFileName;
-                //configuration.Description = configurator.Description;
-                //configuration.DisplayName = configurator.DisplayName;
-                //configuration.StartManually = configurator.StartManually;
-                //configuration.Username = configurator.Username;
-                //configuration.Password = configurator.Password;
-                //configuration.HostTypeAssemblyQualifiedName = configurator.HostTypeAssemblyQualifiedName;
-                //configuration.Instance = configurator.Instance;
-                //configuration.ServiceName = configurator.ServiceName;
-
-                //installer.Install(configuration);
-            }
-            finally
-            {
-                AppDomain.Unload(domain);
-            }
-        }
-
-        private static AppDomain RemoteDomain(string serviceAssemblyPath)
-        {
-            if (!File.Exists(serviceAssemblyPath))
-            {
-                throw new ApplicationException(string.Format("Service assembly path '{0}' does not exist.",
-                    serviceAssemblyPath));
-            }
-
-            var setup = new AppDomainSetup
-            {
-                ApplicationBase = Path.GetDirectoryName(serviceAssemblyPath)
-            };
-
-            return AppDomain.CreateDomain("installer", AppDomain.CurrentDomain.Evidence, setup);
-        }
-
-        private void UninstallRemoteService(IServiceConfigurator configurator)
-        {
-            var domain = RemoteDomain(configurator.ServiceAssemblyPath);
-
-            try
-            {
-                var installer =
-                    (WindowsServiceInstaller)
-                        domain.CreateInstanceFromAndUnwrap(configurator.ServiceAssemblyPath,
-                            typeof(WindowsServiceInstaller).FullName);
-
-                throw new NotImplementedException();
-                //var configuration =
-                //    (ServiceInstallerConfiguration)
-                //        domain.CreateInstanceFromAndUnwrap(configurator.ServiceAssemblyPath,
-                //            typeof(ServiceInstallerConfiguration).FullName);
-
-                //configuration.HostTypeAssemblyQualifiedName =
-                //    configurator.HostTypeAssemblyQualifiedName;
-                //configuration.Instance = configurator.Instance;
-                //configuration.ServiceName = configurator.ServiceName;
-
-                //installer.Uninstall(configuration);
-            }
-            finally
-            {
-                AppDomain.Unload(domain);
-            }
-        }
-
-        public void Uninstall(IServiceConfigurator configurator)
+        public void Uninstall(IServiceConfiguration configuration)
         {
             GuardAdministrator();
 
-            Guard.AgainstNull(configurator, "configurator");
+            Guard.AgainstNull(configuration, "configuration");
 
-            if (!string.IsNullOrEmpty(configurator.ServiceAssemblyPath))
+            if (!string.IsNullOrEmpty(configuration.ServicePath))
             {
-                UninstallRemoteService(configurator);
+                new ServiceInvoker(configuration).Execute(ServiceCommand.Uninstall);
 
                 return;
             }
 
-            var log = ServiceHostEventLog.GetEventLog(configurator.InstancedServiceName());
+            CallContext.LogicalSetData(ServiceConfigurationKey, configuration);
 
-            CallContext.LogicalSetData(ServiceInstallerConfigurationKey, configurator);
+            var instancedServiceName = configuration.GetInstancedServiceName();
+            var log = ServiceHostEventLog.GetEventLog(instancedServiceName);
 
-            ColoredConsole.WriteLine(ConsoleColor.Green, "Uninstalling service '{0}'.", configurator.InstancedServiceName());
+            ColoredConsole.WriteLine(ConsoleColor.Green, "Uninstalling service '{0}'.", instancedServiceName);
 
             using (var installer = new AssemblyInstaller(typeof(ServiceHost).Assembly, null))
             {
@@ -238,7 +179,7 @@ namespace Shuttle.Core.ServiceHost
                 }
             }
 
-            var message = string.Format("Service '{0}' has been successfully uninstalled.", configurator.InstancedServiceName());
+            var message = string.Format("Service '{0}' has been successfully uninstalled.", instancedServiceName);
 
             log.WriteEntry(message);
 

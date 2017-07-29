@@ -8,7 +8,7 @@ namespace Shuttle.Core.ServiceHost.Server
     {
         private static void Main()
         {
-            ServiceHost.Run<TestHost>(c=> c.WithServiceName("Server"));
+            ServiceHost.Run<TestHost>();
         }
 
         public class TestHost : IServiceHost, IThreadState

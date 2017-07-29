@@ -25,7 +25,7 @@ namespace Shuttle.Core.ServiceHost.Tests
         {
             new WindowsServiceInstaller().Install(new ServiceConfiguration()
                 .WithServiceName("Shuttle.Core.ServiceHost.Server")
-                .WithServicePath(GetServicePath(), 30));
+                .WithServicePath(GetServicePath(), 30000));
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace Shuttle.Core.ServiceHost.Tests
         {
             new WindowsServiceInstaller().Uninstall(new ServiceConfiguration()
                 .WithServiceName("Shuttle.Core.ServiceHost.Server")
-                .WithServicePath(GetServicePath(), 30));
+                .WithServicePath(GetServicePath(), 30000));
         }
     }
 }
