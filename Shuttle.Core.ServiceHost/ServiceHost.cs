@@ -12,14 +12,14 @@ namespace Shuttle.Core.ServiceHost
         private readonly ServiceHostEventLog _log;
         private readonly IServiceHostStart _service;
 
-        private ServiceHost(IServiceHostStart service, ServiceConfigurator configurator)
+        private ServiceHost(IServiceHostStart service, ServiceConfiguration configuration)
         {
             Guard.AgainstNull(service, nameof(service));
-            Guard.AgainstNull(configurator, nameof(configurator));
+            Guard.AgainstNull(configuration, nameof(configuration));
 
             _service = service;
 
-            ServiceName = configurator.ServiceName;
+            ServiceName = configuration.ServiceName;
 
             _log = new ServiceHostEventLog(ServiceName);
 
@@ -57,30 +57,30 @@ namespace Shuttle.Core.ServiceHost
             _log.WrinteEntry(string.Format("[stopped] : service name = '{0}'", ServiceName));
         }
 
-        public void Execute<T>() where T : IServiceHostStart, new()
+        public static void Run<T>() where T : IServiceHostStart, new()
         {
-            Execute(new T(), null);
+            Run(new T(), null);
         }
 
-        public void Execute<T>(Action<ServiceConfigurator> configure) where T : IServiceHostStart, new ()
+        public static void Run<T>(Action<ServiceConfiguration> configure) where T : IServiceHostStart, new ()
         {
-            Execute(new T(), configure);
+            Run(new T(), configure);
         }
 
-        public void Execute(IServiceHostStart service)
+        public static void Run(IServiceHostStart service)
         {
-            Execute(service, null);
+            Run(service, null);
         }
 
-        public void Execute(IServiceHostStart service, Action<ServiceConfigurator> configure)
+        public static void Run(IServiceHostStart service, Action<ServiceConfiguration> configure)
         {
             Guard.AgainstNull(service, nameof(service));
 
-            var configurator = new ServiceConfigurator();
+            var configuration = new ServiceConfiguration();
 
-            configure?.Invoke(configurator);
+            configure?.Invoke(configuration);
 
-            if (new CommandProcessor().Execute(configurator))
+            if (new CommandProcessor().Execute(configuration))
             {
                 return;
             }
@@ -91,14 +91,14 @@ namespace Shuttle.Core.ServiceHost
                 {
                     Run(new ServiceBase[]
                     {
-                        new ServiceHost(service, configurator)
+                        new ServiceHost(service, configuration)
                     });
                 }
                 else
                 {
                     Console.CursorVisible = false;
 
-                    new ConsoleService(service, configurator).Execute();
+                    new ConsoleService(service, configuration).Execute();
                 }
             }
             catch (Exception ex)

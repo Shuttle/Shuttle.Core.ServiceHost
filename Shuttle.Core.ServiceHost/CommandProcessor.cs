@@ -9,15 +9,15 @@ namespace Shuttle.Core.ServiceHost
 {
     public class CommandProcessor
     {
-        public bool Execute(ServiceConfigurator configurator)
+        public bool Execute(ServiceConfiguration configuration)
         {
-            Guard.AgainstNull(configurator, nameof(configurator));
+            Guard.AgainstNull(configuration, nameof(configuration));
 
             try
             {
                 var arguments = new Arguments(Environment.GetCommandLineArgs());
 
-                configurator.WithArguments(arguments);
+                configuration.WithArguments(arguments);
 
                 if (ShouldShowHelp(arguments))
                 {
@@ -41,14 +41,14 @@ namespace Shuttle.Core.ServiceHost
 
                 if (!string.IsNullOrEmpty(uninstall))
                 {
-                    new WindowsServiceInstaller().Uninstall(configurator);
+                    new WindowsServiceInstaller().Uninstall(configuration);
 
                     return true;
                 }
 
                 if (!string.IsNullOrEmpty(install))
                 {
-                    new WindowsServiceInstaller().Install(configurator);
+                    new WindowsServiceInstaller().Install(configuration);
 
                     return true;
                 }
@@ -69,7 +69,10 @@ namespace Shuttle.Core.ServiceHost
 
                     throw;
                 }
+
+                return true;
             }
+
             return false;
         }
 

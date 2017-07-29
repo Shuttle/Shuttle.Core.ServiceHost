@@ -60,6 +60,10 @@
     <DefineConstants>$(DefineConstants);NET462FULL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Shuttle.Core.Infrastructure, Version=8.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Shuttle.Core.Infrastructure.8.0.2\lib\net40-full\Shuttle.Core.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
@@ -68,19 +72,20 @@
   <ItemGroup>
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="ConsoleService.cs" />
+    <Compile Include="IServiceHost.cs" />
     <Compile Include="ServiceHostInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="IServiceConfigurator.cs" />
-    <Compile Include="ServiceConfiguratorExtensions.cs" />
+    <Compile Include="IServiceConfiguration.cs" />
     <Compile Include="ServiceHostEventLog.cs" />
     <Compile Include="IServiceHostStart.cs" />
     <Compile Include="IServiceHostStop.cs" />
-    <Compile Include="ServiceConfigurator.cs" />
+    <Compile Include="ServiceConfiguration.cs" />
     <Compile Include="ServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceInvoker.cs" />
     <Compile Include="WindowsServiceInstaller.cs" />
   </ItemGroup>
   <ItemGroup>

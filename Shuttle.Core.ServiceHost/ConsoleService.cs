@@ -9,28 +9,28 @@ namespace Shuttle.Core.ServiceHost
     public class ConsoleService
     {
         private readonly IServiceHostStart _service;
-        private readonly ServiceConfigurator _configurator;
+        private readonly ServiceConfiguration _configuration;
 
-        public ConsoleService(IServiceHostStart service, ServiceConfigurator configurator)
+        public ConsoleService(IServiceHostStart service, ServiceConfiguration configuration)
         {
             Guard.AgainstNull(service, nameof(service));
-            Guard.AgainstNull(configurator, nameof(configurator));
+            Guard.AgainstNull(configuration, nameof(configuration));
 
             _service = service;
-            _configurator = configurator;
+            _configuration = configuration;
         }
 
         public void Execute()
         {
             var serviceController =
                 ServiceController.GetServices()
-                    .FirstOrDefault(s => s.ServiceName == _configurator.ServiceName);
+                    .FirstOrDefault(s => s.ServiceName == _configuration.ServiceName);
 
             if (serviceController != null && serviceController.Status == ServiceControllerStatus.Running)
             {
                 ColoredConsole.WriteLine(ConsoleColor.Yellow,
                     "WARNING: Windows service '{0}' is running.  The display name is '{1}'.",
-                    _configurator.ServiceName, serviceController.DisplayName);
+                    _configuration.ServiceName, serviceController.DisplayName);
                 Console.WriteLine();
             }
 
@@ -57,7 +57,7 @@ namespace Shuttle.Core.ServiceHost
 
             Console.WriteLine();
             ColoredConsole.WriteLine(ConsoleColor.Green, "[started] : '{0}'.",
-                _configurator.ServiceName);
+                _configuration.ServiceName);
             Console.WriteLine();
             ColoredConsole.WriteLine(ConsoleColor.DarkYellow, "[press ctrl+c to stop]");
             Console.WriteLine();

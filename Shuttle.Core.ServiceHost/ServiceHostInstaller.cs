@@ -10,7 +10,7 @@ namespace Shuttle.Core.ServiceHost
     [RunInstaller(true)]
     public class ServiceHostInstaller : Installer
     {
-        private ILog _log;
+        private readonly ILog _log;
 
         public ServiceHostInstaller()
         {
@@ -19,16 +19,16 @@ namespace Shuttle.Core.ServiceHost
 
         public override void Install(IDictionary stateSaver)
         {
-            var configurator =
-                (IServiceConfigurator)CallContext.LogicalGetData(WindowsServiceInstaller.ServiceConfiguratorKey);
+            var configuration =
+                (IServiceConfiguration)CallContext.LogicalGetData(WindowsServiceInstaller.ServiceConfigurationKey);
 
-            if (configurator == null)
+            if (configuration == null)
             {
                 throw new InstallException("No install configuration could be located in the call context.");
             }
 
-            var hasUserName = !string.IsNullOrEmpty(configurator.Username);
-            var hasPassword = !string.IsNullOrEmpty(configurator.Password);
+            var hasUserName = !string.IsNullOrEmpty(configuration.Username);
+            var hasPassword = !string.IsNullOrEmpty(configuration.Password);
 
             if (hasUserName && !hasPassword)
             {
@@ -42,13 +42,13 @@ namespace Shuttle.Core.ServiceHost
 
             var processInstaller = new ServiceProcessInstaller();
 
-            if (hasUserName && hasPassword)
+            if (hasUserName)
             {
-                _log.Trace(string.Format("[ServiceAccount] : username = '{0}' with specified password", configurator.Username));
+                _log.Trace(string.Format("[ServiceAccount] : username = '{0}' with specified password", configuration.Username));
 
                 processInstaller.Account = ServiceAccount.User;
-                processInstaller.Username = configurator.Username;
-                processInstaller.Password = configurator.Password;
+                processInstaller.Username = configuration.Username;
+                processInstaller.Password = configuration.Password;
             }
             else
             {
@@ -59,10 +59,10 @@ namespace Shuttle.Core.ServiceHost
 
             var installer = new ServiceInstaller
             {
-                DisplayName = configurator.DisplayName,
-                ServiceName = configurator.InstancedServiceName(),
-                Description = configurator.Description,
-                StartType = configurator.ServiceStartMode
+                DisplayName = configuration.DisplayName,
+                ServiceName = configuration.GetInstancedServiceName(),
+                Description = configuration.Description,
+                StartType = configuration.StartMode
             };
 
             Installers.Add(processInstaller);
@@ -74,8 +74,8 @@ namespace Shuttle.Core.ServiceHost
         public override void Uninstall(IDictionary savedState)
         {
             var configuration =
-                (IServiceConfigurator)
-                    CallContext.LogicalGetData(WindowsServiceInstaller.ServiceInstallerConfigurationKey);
+                (IServiceConfiguration)
+                    CallContext.LogicalGetData(WindowsServiceInstaller.ServiceConfigurationKey);
 
             if (configuration == null)
             {
@@ -86,7 +86,7 @@ namespace Shuttle.Core.ServiceHost
 
             var installer = new ServiceInstaller
             {
-                ServiceName = configuration.InstancedServiceName()
+                ServiceName = configuration.GetInstancedServiceName()
             };
 
             Installers.Add(processInstaller);
