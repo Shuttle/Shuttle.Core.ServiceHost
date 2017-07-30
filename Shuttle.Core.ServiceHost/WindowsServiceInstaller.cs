@@ -72,12 +72,12 @@ namespace Shuttle.Core.ServiceHost
 
                     serviceKey.SetValue("Description", configuration.Description);
                     serviceKey.SetValue("ImagePath",
-                        string.Format("{0} /serviceName:\"{1}\"{2}",
+                        string.Format("{0} /serviceName=\"{1}\"{2}",
                             entryAssemblyLocation,
                             configuration.ServiceName,
                             string.IsNullOrEmpty(configuration.Instance)
                                 ? string.Empty
-                                : string.Format(" /instance:\"{0}\"", configuration.Instance)));
+                                : string.Format(" /instance=\"{0}\"", configuration.Instance)));
                 }
                 catch (Exception ex)
                 {

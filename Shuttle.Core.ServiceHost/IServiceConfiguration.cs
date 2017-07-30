@@ -12,17 +12,18 @@ namespace Shuttle.Core.ServiceHost
         string Password { get; }
         string DisplayName { get; }
         string Description { get; }
-        int ExecutionTimeout { get; }
+        int Timeout { get; }
         ServiceStartMode StartMode { get; }
         IServiceConfiguration WithServiceName(string serviceName);
         IServiceConfiguration WithInstance(string instance);
-        IServiceConfiguration WithServicePath(string path, int executionTimeout);
+        IServiceConfiguration WithServicePath(string path);
         IServiceConfiguration WithUsername(string username);
         IServiceConfiguration WithPassword(string password);
         IServiceConfiguration WithDisplayName(string displayName);
         IServiceConfiguration WithDescription(string description);
-        IServiceConfiguration WithServiceStartMode(ServiceStartMode startMode);
+        IServiceConfiguration WithStartMode(ServiceStartMode startMode);
         IServiceConfiguration WithArguments(Arguments arguments);
+        IServiceConfiguration WithTimeout(int timeout);
         string GetInstancedServiceName();
         string CommandLine();
     }

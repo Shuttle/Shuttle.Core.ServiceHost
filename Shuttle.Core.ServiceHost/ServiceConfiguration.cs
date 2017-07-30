@@ -12,6 +12,7 @@ namespace Shuttle.Core.ServiceHost
         private string _description;
         private string _displayName;
         private string _serviceName;
+        private string _version;
 
         public ServiceConfiguration()
         {
@@ -19,13 +20,17 @@ namespace Shuttle.Core.ServiceHost
 
             if (entryAssembly != null)
             {
-                _serviceName = entryAssembly.GetName().Name;
+                var assemblyName = entryAssembly.GetName();
+
+                _serviceName = assemblyName.Name;
+                _version = $" ({assemblyName.Version.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build})";
             }
 
             Instance = string.Empty;
             Username = string.Empty;
             Password = string.Empty;
             ServicePath = string.Empty;
+            Timeout = 30000;
 
             StartMode = ServiceStartMode.Automatic;
         }
@@ -64,7 +69,7 @@ namespace Shuttle.Core.ServiceHost
             return this;
         }
 
-        public IServiceConfiguration WithServicePath(string path, int executionTimeout)
+        public IServiceConfiguration WithServicePath(string path)
         {
             Guard.AgainstNullOrEmptyString(path, nameof(path));
 
@@ -74,19 +79,18 @@ namespace Shuttle.Core.ServiceHost
             }
 
             ServicePath = path;
-            ExecutionTimeout = executionTimeout < 30 ? 30 : executionTimeout;
 
             return this;
         }
 
-        public int ExecutionTimeout { get; private set; }
+        public int Timeout { get; private set; }
 
         public string Username { get; private set; }
         public string Password { get; private set; }
 
         public string DisplayName => !string.IsNullOrEmpty(_displayName)
             ? _displayName
-            : ServiceName;
+            : string.Concat(GetInstancedServiceName(), _version);
 
         public string Description => !string.IsNullOrEmpty(_description)
             ? _description
@@ -130,7 +134,7 @@ namespace Shuttle.Core.ServiceHost
             return this;
         }
 
-        public IServiceConfiguration WithServiceStartMode(ServiceStartMode startMode)
+        public IServiceConfiguration WithStartMode(ServiceStartMode startMode)
         {
             if (!Enum.IsDefined(typeof(ServiceStartMode), startMode))
             {
@@ -213,6 +217,13 @@ namespace Shuttle.Core.ServiceHost
             result.Append($" /startMode=\"{StartMode}\"");
 
             return result.ToString();
+        }
+
+        public IServiceConfiguration WithTimeout(int timeout)
+        {
+            Timeout = timeout < 30 ? 30 : timeout;
+
+            return this;
         }
     }
 }

@@ -13,6 +13,8 @@ namespace Shuttle.Core.ServiceHost
         {
             Guard.AgainstNull(configuration, nameof(configuration));
 
+            var result = false;
+
             try
             {
                 var arguments = new Arguments(Environment.GetCommandLineArgs());
@@ -39,18 +41,50 @@ namespace Shuttle.Core.ServiceHost
                     throw new InstallException("Cannot specify /install and /uninstall together.");
                 }
 
+                var start = arguments.Get("start", string.Empty);
+                var stop = arguments.Get("stop", string.Empty);
+                var timeoutValue = arguments.Get("timeout", "30000");
+                int timeout;
+
+                if (!int.TryParse(timeoutValue, out timeout))
+                {
+                    timeout = 30000;
+                }
+
+                configuration.WithTimeout(timeout);
+
                 if (!string.IsNullOrEmpty(uninstall))
                 {
                     new WindowsServiceInstaller().Uninstall(configuration);
 
-                    return true;
+                    result= true;
                 }
 
                 if (!string.IsNullOrEmpty(install))
                 {
                     new WindowsServiceInstaller().Install(configuration);
 
-                    return true;
+                    result = true;
+                }
+
+                var shouldStop = !string.IsNullOrEmpty(stop);
+                var shouldStart = !string.IsNullOrEmpty(start);
+
+                if (shouldStop || shouldStart)
+                {
+                    var controller = new ServiceHostController(configuration);
+
+                    if (shouldStop)
+                    {
+                        controller.Stop();
+                    }
+
+                    if (shouldStart)
+                    {
+                        controller.Start();
+                    }
+
+                    result = true;
                 }
             }
             catch (Exception ex)
@@ -70,10 +104,10 @@ namespace Shuttle.Core.ServiceHost
                     throw;
                 }
 
-                return true;
+                result = true;
             }
 
-            return false;
+            return result;
         }
 
         public bool ShouldShowHelp(Arguments arguments)

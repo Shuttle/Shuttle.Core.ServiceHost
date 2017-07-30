@@ -56,7 +56,7 @@ namespace Shuttle.Core.ServiceHost
 
             process.Start();
             process.BeginOutputReadLine();
-            var existed = process.WaitForExit(_configuration.ExecutionTimeout);
+            var existed = process.WaitForExit(_configuration.Timeout);
             process.CancelOutputRead();
 
             if (!existed)

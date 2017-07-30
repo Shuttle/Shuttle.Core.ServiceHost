@@ -1,50 +1,97 @@
-! Shuttle.Core.ServiceHost
+# Shuttle.Core.ServiceHost
 
 Turns your console application into a Windows service.
 
-A typical implementation would be the following:
+A typical implementation would be as follows:
 
 ~~~ c#
 using System;
-using Shuttle.Core.Host;
+using System.Threading;
+using Shuttle.Core.Infrastructure;
 
-namespace Domain.Server
+namespace Shuttle.Core.ServiceHost.Server
 {
-	public class Host : IHost, IDisposable
-	{
-		private volatile bool active = true;
-	
-		public void Start()
-		{
-		   while (active)
-		   {
-				// perform some processing
-		   }
-		}
+    internal class Program
+    {
+        private static void Main()
+        {
+            ServiceHost.Run<TestHost>();
+        }
 
-		public void Dispose()
-		{
-			active = false;
-		}
-	}
+        public class TestHost : IServiceHost, IThreadState
+        {
+            private readonly Thread _thread;
+            private volatile bool _active;
+
+            public TestHost()
+            {
+                _thread = new Thread(Worker);
+            }
+
+            public void Start()
+            {
+                _active = true;
+                _thread.Start();
+            }
+
+            public void Stop()
+            {
+                _active = false;
+                _thread.Join(5000);
+            }
+
+            public bool Active => _active;
+
+            private void Worker()
+            {
+                while (_active)
+                {
+                    Console.WriteLine($"[working] : {DateTime.Now:O}");
+                    ThreadSleep.While(1000, this);
+                }
+            }
+        }
+    }
 }
 ~~~
 
-When the generic host is executed it searches for all classes that implement the `IHost`.  It needs to find exactly 1 class implementing the interface else it fails with an exception.  If you *do* have more than one type implementing the interface you can specify the interface using an argument:
+Implement the `IServiceHost` interface if you need both `Start()` and `Stop()` methods; else `IServiceHostStart` for `Start()` and `IServiceHostStop` for `Stop()` although there would be little value in having only a `Stop()`.  If you do not need a `Stop()` method or you prefer using `IDisposable` to handle the destruction then you would go with only the `IServiceHostStart` interface.
 
+## Running the Service
+
+The following methods are available to get this going on the `ServiceHost` class:
+
+~~~ c#
+public static void Run<T>() where T : IServiceHostStart, new()
+public static void Run<T>(Action<IServiceConfiguration> configure) where T : IServiceHostStart, new()
+public static void Run(IServiceHostStart service)
+public static void Run(IServiceHostStart service, Action<IServiceConfiguration> configure)
 ~~~
-/hostType="assembly qualified name"
+
+The `IServiceConfiguration` allows you to configure the service from code.  Configuration supplied through code has the highest precedence.
+
+## Configuration Section
+
+You may also specify configuration using the following configuration which may, as all Shuttle configuration sections do, be grouped under a `shuttle` group.
+
+~~~ xml
+<configuration>
+  <configSections>
+    <section name="service" type="Shuttle.Core.ServiceHost.ServiceHostSection, Shuttle.Core.ServiceHost" />
+  </configSections>
+
+  <service
+    serviceName="test-service"
+    instance="one"
+    username="mr.resistor"
+    password="ohm"
+    startMode="Disabled" />
+</configuration>
 ~~~
 
-In order to debug applications that use the `IHost` interface you would simply need to set the `Shuttle.Core.Host.exe` as the startup application for your project:
+## Command Line
 
-![Host Debug Image]({{ site.baseurl }}/assets/images/host-debug.png "Host Debug")
-
-You would probably want to use some thread-base processing but that is up to you.
-
-Notice the `IDisposable` implementation.  Whenever a service is stopped, or `ctrl+c` pressed for a console application, the `IHost` instance is safe-cast to `IDisposable`.  If the host instance implements `IDisposable` the `Dispose` method will be called.
-
-The following command-line arguments are available and can be viewed by running `Shuttle.Core.Host /?`:
+The following command-line arguments are available and can be viewed by running `{your-console}.exe /?`:
 
 ~~~
 	[/install [/serviceName]]	
@@ -56,48 +103,39 @@ The following command-line arguments are available and can be viewed by running 
 	[/description]				
 		- Description for the service
 		
-	[/hostType]	
-		- type implementing IHost that should be used
-		
 	[/instance]					
 		- unique name of the instance you wish to install
 		
-	[/configurationFileName]
-		- an alternate configuration file name to use instead of {IHost.dll}.config
-
-	[/startManually]			
-		- specifies that the service should start manually
+	[/startMode]			
+		- specifies that the service start mode (Boot, System, Automatic, Manual, Disabled)
 		
-	[/username]					
-		- username of the account to use for the service
-		
-	[/password]]				
-		- password of the account to use for the service
-		
+	[/username /password]
+		- username and password of the account to use for the service
 	- or -
 	
 	[/uninstall [/serviceName] [/instance]]	
-~~~		
 
-## IHost
-As mentioned, if no `/hostType` is specified the folder the `Shuttle.Core.Host.exe` is in will be scanned for the class implementing `IHost`.  Should no class, or more than 1 class, be located an exception will be raised.
+	[/start]
+		- starts the service instance
+
+	[/stop]
+		- stops the service instance
+~~~
 
 ## Service Name
-If no `/serviceName` is specified the full name of the service bus host type will be used along with the version number of the assembly it is contained within.
+
+If no `/serviceName` is specified the full name of the your console application along with the version number, e.g.:
 
 ~~~
-	Shuttle.Application.Server.Host (1.0.0.0)
+	Namespace.ConsoleApplication (1.0.0.0)
 ~~~
-
-## Display Name
-The default for the `/displayName` is the same value as `/serviceName`, and the description defaults to a generic service bus host description.
 
 ## Uninstall
 
 If you set the `/serviceName` and/or `/instance` during installation you will need to specify them when uninstalling as well, e.g.:
 
 ~~~
-	Shuttle.Core.Host.exe 
+	{your=console}.exe 
 		/uninstall 
 		/serviceName:"Shuttle.Application.Server" 
 		/instance:"Instance5"
@@ -106,36 +144,12 @@ If you set the `/serviceName` and/or `/instance` during installation you will ne
 ## Example
 
 ~~~
-Shuttle.Core.Host.exe 
+{your=console}.exe 
 	/install 
 	/serviceName:"Shuttle.Application.Server" 
 	/displayName:"Shuttle server for the application"
-	/description:"Service to handle messages relating to the application" 
-	/hostType:"QualifiedNamespace.Host, AssemblyName"
+	/description:"Service to handle messages relating to the application." 
 	/username:"domain\hostuser"
 	/password:"p@ssw0rd!"
 ~~~
 
-# API
-
-It is also possible to install and uninstall services that make use of `shuttle-core-host` by using the `WindowsServiceInstaller` class:
-
-~~~ c#
-var windowsServiceInstaller = new WindowsServiceInstaller();
-
-var installConfiguration = new InstallConfiguration
-{
-	ServiceAssemblyPath = @"{path to your service}\Shuttle.Core.Host.exe",
-	// more arguments may be specified
-};  
-
-windowsServiceInstaller.Install(installConfiguration);
-
-var serviceInstallerConfiguration = new ServiceInstallerConfiguration
-{
-	ServiceAssemblyPath = @"{path to your service}\Shuttle.Core.Host.exe",
-	// more arguments may be specified
-};
-
-windowsServiceInstaller.Uninstall(serviceInstallerConfiguration);
-~~~

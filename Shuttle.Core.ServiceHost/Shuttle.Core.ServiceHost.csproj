@@ -65,6 +65,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceProcess" />
@@ -73,6 +74,7 @@
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="ConsoleService.cs" />
     <Compile Include="IServiceHost.cs" />
+    <Compile Include="ServiceHostController.cs" />
     <Compile Include="ServiceHostInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -85,6 +87,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceHostSection.cs" />
     <Compile Include="ServiceInvoker.cs" />
     <Compile Include="WindowsServiceInstaller.cs" />
   </ItemGroup>

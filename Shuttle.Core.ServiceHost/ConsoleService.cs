@@ -9,9 +9,9 @@ namespace Shuttle.Core.ServiceHost
     public class ConsoleService
     {
         private readonly IServiceHostStart _service;
-        private readonly ServiceConfiguration _configuration;
+        private readonly IServiceConfiguration _configuration;
 
-        public ConsoleService(IServiceHostStart service, ServiceConfiguration configuration)
+        public ConsoleService(IServiceHostStart service, IServiceConfiguration configuration)
         {
             Guard.AgainstNull(service, nameof(service));
             Guard.AgainstNull(configuration, nameof(configuration));

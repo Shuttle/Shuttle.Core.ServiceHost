@@ -12,7 +12,7 @@
     <description>Turns your console application into a Windows service.</description>
     <releaseNotes/>
 		<copyright>Copyright (c) {year}, Eben Roux</copyright>
-    <tags>shuttle shuttle-core shuttle-core-host windows-service</tags>
+    <tags>shuttle shuttle-core shuttle-core-host windows-service service-host</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.ServiceProcess" />
     </frameworkAssemblies>

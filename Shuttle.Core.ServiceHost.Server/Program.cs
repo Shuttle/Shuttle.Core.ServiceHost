@@ -39,7 +39,7 @@ namespace Shuttle.Core.ServiceHost.Server
             {
                 while (_active)
                 {
-                    Console.WriteLine($"[working] : {DateTime.Now:f}");
+                    Console.WriteLine($"[working] : {DateTime.Now:O}");
                     ThreadSleep.While(1000, this);
                 }
             }

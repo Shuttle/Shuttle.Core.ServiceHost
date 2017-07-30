@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.ServiceProcess;
-using System.Threading;
 using Shuttle.Core.Infrastructure;
 
 namespace Shuttle.Core.ServiceHost
@@ -12,7 +10,7 @@ namespace Shuttle.Core.ServiceHost
         private readonly ServiceHostEventLog _log;
         private readonly IServiceHostStart _service;
 
-        private ServiceHost(IServiceHostStart service, ServiceConfiguration configuration)
+        private ServiceHost(IServiceHostStart service, IServiceConfiguration configuration)
         {
             Guard.AgainstNull(service, nameof(service));
             Guard.AgainstNull(configuration, nameof(configuration));
@@ -21,9 +19,14 @@ namespace Shuttle.Core.ServiceHost
 
             ServiceName = configuration.ServiceName;
 
-            _log = new ServiceHostEventLog(ServiceName);
+            _log = GetServiceHostEventLog(configuration);
 
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
+        }
+
+        private static ServiceHostEventLog GetServiceHostEventLog(IServiceConfiguration configuration)
+        {
+            return new ServiceHostEventLog(configuration.ServiceName);
         }
 
         private void UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -35,16 +38,16 @@ namespace Shuttle.Core.ServiceHost
 
         protected override void OnStart(string[] args)
         {
-            _log.WrinteEntry(string.Format("[starting] : service name = '{0}'", ServiceName));
+            _log.WrinteEntry($"[starting] : service name = '{ServiceName}'");
 
             _service.Start();
 
-            _log.WrinteEntry(string.Format("[started] : service name = '{0}'", ServiceName));
+            _log.WrinteEntry($"[started] : service name = '{ServiceName}'");
         }
 
         protected override void OnStop()
         {
-            _log.WrinteEntry(string.Format("[stopping] : service name = '{0}'", ServiceName));
+            _log.WrinteEntry($"[stopping] : service name = '{ServiceName}'");
 
             var stoppable = _service as IServiceHostStop;
 
@@ -54,58 +57,90 @@ namespace Shuttle.Core.ServiceHost
 
             disposable?.Dispose();
 
-            _log.WrinteEntry(string.Format("[stopped] : service name = '{0}'", ServiceName));
+            _log.WrinteEntry($"[stopped] : service name = '{ServiceName}'");
         }
 
         public static void Run<T>() where T : IServiceHostStart, new()
         {
+            if (CommandProcessed())
+            {
+                return;
+            }
+
             Run(new T(), null);
         }
 
-        public static void Run<T>(Action<ServiceConfiguration> configure) where T : IServiceHostStart, new ()
+        public static void Run<T>(Action<IServiceConfiguration> configure) where T : IServiceHostStart, new()
         {
+            if (CommandProcessed(configure))
+            {
+                return;
+            }
+
             Run(new T(), configure);
         }
 
         public static void Run(IServiceHostStart service)
         {
-            Run(service, null);
-        }
-
-        public static void Run(IServiceHostStart service, Action<ServiceConfiguration> configure)
-        {
-            Guard.AgainstNull(service, nameof(service));
-
-            var configuration = new ServiceConfiguration();
-
-            configure?.Invoke(configuration);
-
-            if (new CommandProcessor().Execute(configuration))
+            if (CommandProcessed())
             {
                 return;
             }
 
-            try
+            Run(service, null);
+        }
+
+        public static void Run(IServiceHostStart service, Action<IServiceConfiguration> configure)
+        {
+            if (CommandProcessed(configure))
             {
-                if (!Environment.UserInteractive)
+                return;
+            }
+
+            Guard.AgainstNull(service, nameof(service));
+
+            var configuration = ServiceHostSection.Configuration();
+
+            configure?.Invoke(configuration);
+
+            if (!Environment.UserInteractive)
+            {
+                try
                 {
                     Run(new ServiceBase[]
                     {
                         new ServiceHost(service, configuration)
                     });
                 }
-                else
+                catch (Exception ex)
+                {
+                    GetServiceHostEventLog(configuration).WrinteEntry(ex.Message, EventLogEntryType.Error);
+                    throw;
+                }
+            }
+            else
+            {
+                try
                 {
                     Console.CursorVisible = false;
 
                     new ConsoleService(service, configuration).Execute();
                 }
+                catch (Exception ex)
+                {
+                    Log.For(typeof(ServiceHost)).Error(ex.Message);
+                    throw;
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw;
-            }
+        }
+
+        private static bool CommandProcessed(Action<IServiceConfiguration> configure = null)
+        {
+            var configuration = new ServiceConfiguration();
+
+            configure?.Invoke(configuration);
+
+            return new CommandProcessor().Execute(configuration);
         }
     }
 }

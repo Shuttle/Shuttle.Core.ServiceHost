@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using NUnit.Framework;
 using Shuttle.Core.Infrastructure;
@@ -19,7 +18,7 @@ namespace Shuttle.Core.ServiceHost.Tests
                 .WithDescription("Service Description")
                 .WithUsername("mr.resistor")
                 .WithPassword("ohm")
-                .WithServiceStartMode(ServiceStartMode.Disabled)
+                .WithStartMode(ServiceStartMode.Disabled)
                 .CommandLine();
 
             Assert.AreEqual(
