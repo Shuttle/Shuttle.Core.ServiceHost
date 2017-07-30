@@ -94,32 +94,32 @@ You may also specify configuration using the following configuration which may, 
 The following command-line arguments are available and can be viewed by running `{your-console}.exe /?`:
 
 ~~~
-	[/install [/serviceName]]	
-		- install the service
+[/install [/serviceName]]	
+	- install the service
 		
-	[/displayName]				
-		- friendly name for the installed service
+[/displayName]				
+	- friendly name for the installed service
 		
-	[/description]				
-		- Description for the service
+[/description]				
+	- Description for the service
 		
-	[/instance]					
-		- unique name of the instance you wish to install
+[/instance]					
+	- unique name of the instance you wish to install
 		
-	[/startMode]			
-		- specifies that the service start mode (Boot, System, Automatic, Manual, Disabled)
+[/startMode]			
+	- specifies that the service start mode (Boot, System, Automatic, Manual, Disabled)
 		
-	[/username /password]
-		- username and password of the account to use for the service
-	- or -
+[/username /password]
+	- username and password of the account to use for the service
+- or -
 	
-	[/uninstall [/serviceName] [/instance]]	
+[/uninstall [/serviceName] [/instance]]	
 
-	[/start]
-		- starts the service instance
+[/start]
+	- starts the service instance
 
-	[/stop]
-		- stops the service instance
+[/stop]
+	- stops the service instance
 ~~~
 
 ## Service Name
@@ -127,7 +127,7 @@ The following command-line arguments are available and can be viewed by running 
 If no `/serviceName` is specified the full name of the your console application along with the version number, e.g.:
 
 ~~~
-	Namespace.ConsoleApplication (1.0.0.0)
+Namespace.ConsoleApplication (1.0.0.0)
 ~~~
 
 ## Uninstall
@@ -135,10 +135,10 @@ If no `/serviceName` is specified the full name of the your console application 
 If you set the `/serviceName` and/or `/instance` during installation you will need to specify them when uninstalling as well, e.g.:
 
 ~~~
-	{your=console}.exe 
-		/uninstall 
-		/serviceName:"Shuttle.Application.Server" 
-		/instance:"Instance5"
+{your=console}.exe 
+	/uninstall 
+	/serviceName:"Shuttle.Application.Server" 
+	/instance:"Instance5"
 ~~~
 
 ## Example
