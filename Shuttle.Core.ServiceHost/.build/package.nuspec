@@ -14,5 +14,11 @@
     <releaseNotes />
     <copyright>Copyright (c) {year}, Eben Roux</copyright>
     <tags>shuttle</tags>
+    <dependencies>
+      <dependency id="Shuttle.Core.Cli" version="{Shuttle.Core.Cli-version}" />
+      <dependency id="Shuttle.Core.Logging" version="{Shuttle.Core.Logging-version}" />
+      <dependency id="Shuttle.Core.Reflection" version="{Shuttle.Core.Reflection-version}" />
+      <dependency id="Shuttle.Core.Threading" version="{Shuttle.Core.Threading-version}" />
+    </dependencies>
   </metadata>
 </package>
