@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.ServiceProcess;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Contract;
+using Shuttle.Core.Logging;
 
 namespace Shuttle.Core.ServiceHost
 {

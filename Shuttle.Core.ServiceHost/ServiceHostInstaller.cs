@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Configuration.Install;
 using System.Runtime.Remoting.Messaging;
 using System.ServiceProcess;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Logging;
 
 namespace Shuttle.Core.ServiceHost
 {
@@ -44,7 +44,7 @@ namespace Shuttle.Core.ServiceHost
 
             if (hasUserName)
             {
-                _log.Trace(string.Format("[ServiceAccount] : username = '{0}' with specified password", configuration.Username));
+                _log.Trace($"[ServiceAccount] : username = '{configuration.Username}' with specified password");
 
                 processInstaller.Account = ServiceAccount.User;
                 processInstaller.Username = configuration.Username;

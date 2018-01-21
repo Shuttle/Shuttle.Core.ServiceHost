@@ -3,7 +3,10 @@ using System.Configuration.Install;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Cli;
+using Shuttle.Core.Contract;
+using Shuttle.Core.Logging;
+using Shuttle.Core.Reflection;
 
 namespace Shuttle.Core.ServiceHost
 {
@@ -44,9 +47,8 @@ namespace Shuttle.Core.ServiceHost
                 var start = arguments.Get("start", string.Empty);
                 var stop = arguments.Get("stop", string.Empty);
                 var timeoutValue = arguments.Get("timeout", "30000");
-                int timeout;
 
-                if (!int.TryParse(timeoutValue, out timeout))
+                if (!int.TryParse(timeoutValue, out var timeout))
                 {
                     timeout = 30000;
                 }
@@ -91,15 +93,15 @@ namespace Shuttle.Core.ServiceHost
             {
                 if (Environment.UserInteractive)
                 {
-                    ColoredConsole.WriteLine(ConsoleColor.Red, ex.AllMessages());
+                    ConsoleExtensions.WriteLine(ConsoleColor.Red, ex.AllMessages());
 
                     Console.WriteLine();
-                    ColoredConsole.WriteLine(ConsoleColor.Gray, "Press any key to close...");
+                    ConsoleExtensions.WriteLine(ConsoleColor.Gray, "Press any key to close...");
                     Console.ReadKey();
                 }
                 else
                 {
-                    Log.Fatal(string.Format("[UNHANDLED EXCEPTION] : exception = {0}", ex.AllMessages()));
+                    Log.Fatal($"[UNHANDLED EXCEPTION] : exception = {ex.AllMessages()}");
 
                     throw;
                 }

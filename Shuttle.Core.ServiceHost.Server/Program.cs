@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Threading;
 
 namespace Shuttle.Core.ServiceHost.Server
 {

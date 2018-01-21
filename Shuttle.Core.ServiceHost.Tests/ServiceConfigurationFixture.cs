@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ServiceProcess;
 using NUnit.Framework;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Cli;
 
 namespace Shuttle.Core.ServiceHost.Tests
 {

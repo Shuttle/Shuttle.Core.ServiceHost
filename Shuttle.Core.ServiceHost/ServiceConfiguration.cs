@@ -3,7 +3,8 @@ using System.IO;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Text;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Cli;
+using Shuttle.Core.Contract;
 
 namespace Shuttle.Core.ServiceHost
 {
@@ -12,7 +13,7 @@ namespace Shuttle.Core.ServiceHost
         private string _description;
         private string _displayName;
         private string _serviceName;
-        private string _version;
+        private readonly string _version;
 
         public ServiceConfiguration()
         {
@@ -159,11 +160,9 @@ namespace Shuttle.Core.ServiceHost
 
             if (arguments.Contains("StartMode"))
             {
-                ServiceStartMode startMode;
-
                 var value = arguments.Get<string>("StartMode");
 
-                if (Enum.TryParse(value, true, out startMode))
+                if (Enum.TryParse(value, true, out ServiceStartMode startMode))
                 {
                     StartMode = startMode;
                 }
@@ -180,7 +179,7 @@ namespace Shuttle.Core.ServiceHost
         {
             return string.Concat(ServiceName, string.IsNullOrEmpty(Instance)
                 ? string.Empty
-                : string.Format("${0}", Instance));
+                : $"${Instance}");
         }
 
         public string CommandLine()

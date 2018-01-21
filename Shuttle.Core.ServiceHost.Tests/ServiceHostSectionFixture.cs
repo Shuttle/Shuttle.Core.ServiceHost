@@ -2,7 +2,7 @@
 using System.IO;
 using System.ServiceProcess;
 using NUnit.Framework;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Configuration;
 
 namespace Shuttle.Core.ServiceHost.Tests
 {
@@ -15,7 +15,7 @@ namespace Shuttle.Core.ServiceHost.Tests
         public void Should_be_able_to_load_the_configuration(string file)
         {
             var section = ConfigurationSectionProvider.OpenFile<ServiceHostSection>("shuttle", "service",
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format(@"config-files\{0}", file)));
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"config-files\{file}"));
 
             Assert.IsNotNull(section);
             Assert.AreEqual("test-service", section.ServiceName);

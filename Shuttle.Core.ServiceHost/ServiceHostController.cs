@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ServiceProcess;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Contract;
 
 namespace Shuttle.Core.ServiceHost
 {

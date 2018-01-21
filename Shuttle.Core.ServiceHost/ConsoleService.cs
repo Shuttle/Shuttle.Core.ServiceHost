@@ -2,7 +2,7 @@
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Contract;
 
 namespace Shuttle.Core.ServiceHost
 {
@@ -28,9 +28,8 @@ namespace Shuttle.Core.ServiceHost
 
             if (serviceController != null && serviceController.Status == ServiceControllerStatus.Running)
             {
-                ColoredConsole.WriteLine(ConsoleColor.Yellow,
-                    "WARNING: Windows service '{0}' is running.  The display name is '{1}'.",
-                    _configuration.ServiceName, serviceController.DisplayName);
+                ConsoleExtensions.WriteLine(ConsoleColor.Yellow,
+                    $"WARNING: Windows service '{_configuration.ServiceName}' is running.  The display name is '{serviceController.DisplayName}'.");
                 Console.WriteLine();
             }
 
@@ -45,7 +44,7 @@ namespace Shuttle.Core.ServiceHost
                     return;
                 }
 
-                ColoredConsole.WriteLine(ConsoleColor.Green, "[stopping]");
+                ConsoleExtensions.WriteLine(ConsoleColor.Green, "[stopping]");
 
                 waitHandle.Set();
 
@@ -56,10 +55,9 @@ namespace Shuttle.Core.ServiceHost
             _service.Start();
 
             Console.WriteLine();
-            ColoredConsole.WriteLine(ConsoleColor.Green, "[started] : '{0}'.",
-                _configuration.ServiceName);
+            ConsoleExtensions.WriteLine(ConsoleColor.Green, $"[started] : '{_configuration.ServiceName}'.");
             Console.WriteLine();
-            ColoredConsole.WriteLine(ConsoleColor.DarkYellow, "[press ctrl+c to stop]");
+            ConsoleExtensions.WriteLine(ConsoleColor.DarkYellow, "[press ctrl+c to stop]");
             Console.WriteLine();
 
             WaitHandle.WaitAny(waitHandles);

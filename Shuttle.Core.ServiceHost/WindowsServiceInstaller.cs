@@ -8,7 +8,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Security;
 using System.Security.Principal;
 using Microsoft.Win32;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Contract;
 
 namespace Shuttle.Core.ServiceHost
 {
@@ -34,7 +34,7 @@ namespace Shuttle.Core.ServiceHost
             var instancedServiceName = configuration.GetInstancedServiceName();
             var log = ServiceHostEventLog.GetEventLog(instancedServiceName);
 
-            ColoredConsole.WriteLine(ConsoleColor.Green, "Installing service '{0}'.", instancedServiceName);
+            ConsoleExtensions.WriteLine(ConsoleColor.Green, $"Installing service '{instancedServiceName}'.");
 
             var entryAssembly = Assembly.GetEntryAssembly();
 
@@ -52,7 +52,8 @@ namespace Shuttle.Core.ServiceHost
 
             if (!Path.GetExtension(entryAssemblyLocation).Equals(".exe", StringComparison.InvariantCultureIgnoreCase))
             {
-                throw new InvalidOperationException("The entry assembly must be an 'exe' in order to install as a service.");
+                throw new InvalidOperationException(
+                    "The entry assembly must be an 'exe' in order to install as a service.");
             }
 
             var assemblyInstaller = new AssemblyInstaller(typeof(ServiceHost).Assembly, null);
@@ -72,12 +73,7 @@ namespace Shuttle.Core.ServiceHost
 
                     serviceKey.SetValue("Description", configuration.Description);
                     serviceKey.SetValue("ImagePath",
-                        string.Format("{0} /serviceName=\"{1}\"{2}",
-                            entryAssemblyLocation,
-                            configuration.ServiceName,
-                            string.IsNullOrEmpty(configuration.Instance)
-                                ? string.Empty
-                                : string.Format(" /instance=\"{0}\"", configuration.Instance)));
+                        $"{entryAssemblyLocation} /serviceName=\"{configuration.ServiceName}\"{(string.IsNullOrEmpty(configuration.Instance) ? string.Empty : $" /instance=\"{configuration.Instance}\"")}");
                 }
                 catch (Exception ex)
                 {
@@ -87,7 +83,7 @@ namespace Shuttle.Core.ServiceHost
                     }
                     catch (InstallException installException)
                     {
-                        ColoredConsole.WriteLine(ConsoleColor.DarkYellow, installException.Message);
+                        ConsoleExtensions.WriteLine(ConsoleColor.DarkYellow, installException.Message);
                     }
 
                     log.WriteEntry(ex.Message, EventLogEntryType.Error);
@@ -95,11 +91,11 @@ namespace Shuttle.Core.ServiceHost
                     throw;
                 }
 
-                var message = string.Format("Service '{0}' has been successfully installed.", instancedServiceName);
+                var message = $"Service '{instancedServiceName}' has been successfully installed.";
 
                 log.WriteEntry(message);
 
-                ColoredConsole.WriteLine(ConsoleColor.Green, message);
+                ConsoleExtensions.WriteLine(ConsoleColor.Green, message);
             }
         }
 
@@ -127,9 +123,7 @@ namespace Shuttle.Core.ServiceHost
             }
 
             throw new SecurityException(
-                string.Format(
-                    "Windows identity '{0}' is not an administrator.  Administrator privilege is required to install or uninstall a service.",
-                    windowsIdentity.Name));
+                $"Windows identity '{windowsIdentity.Name}' is not an administrator.  Administrator privilege is required to install or uninstall a service.");
         }
 
         public void Uninstall(IServiceConfiguration configuration)
@@ -150,7 +144,7 @@ namespace Shuttle.Core.ServiceHost
             var instancedServiceName = configuration.GetInstancedServiceName();
             var log = ServiceHostEventLog.GetEventLog(instancedServiceName);
 
-            ColoredConsole.WriteLine(ConsoleColor.Green, "Uninstalling service '{0}'.", instancedServiceName);
+            ConsoleExtensions.WriteLine(ConsoleColor.Green, $"Uninstalling service '{instancedServiceName}'.");
 
             using (var installer = new AssemblyInstaller(typeof(ServiceHost).Assembly, null))
             {
@@ -170,7 +164,7 @@ namespace Shuttle.Core.ServiceHost
                     }
                     catch (InstallException installException)
                     {
-                        ColoredConsole.WriteLine(ConsoleColor.DarkYellow, installException.Message);
+                        ConsoleExtensions.WriteLine(ConsoleColor.DarkYellow, installException.Message);
                     }
 
                     log.WriteEntry(ex.Message, EventLogEntryType.Error);
@@ -179,11 +173,11 @@ namespace Shuttle.Core.ServiceHost
                 }
             }
 
-            var message = string.Format("Service '{0}' has been successfully uninstalled.", instancedServiceName);
+            var message = $"Service '{instancedServiceName}' has been successfully uninstalled.";
 
             log.WriteEntry(message);
 
-            ColoredConsole.WriteLine(ConsoleColor.Green, message);
+            ConsoleExtensions.WriteLine(ConsoleColor.Green, message);
         }
 
         public RegistryKey GetServiceKey(string serviceName)
@@ -198,7 +192,7 @@ namespace Shuttle.Core.ServiceHost
                 return service;
             }
 
-            throw new Exception(string.Format("Could not get registry key for service '{0}'.", serviceName));
+            throw new Exception($"Could not get registry key for service '{serviceName}'.");
         }
     }
 }

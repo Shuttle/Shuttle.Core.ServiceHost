@@ -1,5 +1,5 @@
 ﻿using System.ServiceProcess;
-using Shuttle.Core.Infrastructure;
+using Shuttle.Core.Cli;
 
 namespace Shuttle.Core.ServiceHost
 {
