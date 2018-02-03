@@ -34,21 +34,21 @@ namespace Shuttle.Core.ServiceHost
         {
             var ex = (Exception) e.ExceptionObject;
 
-            _log.WrinteEntry(ex.Message, EventLogEntryType.Error);
+            _log.WriteEntry(ex.Message, EventLogEntryType.Error);
         }
 
         protected override void OnStart(string[] args)
         {
-            _log.WrinteEntry($"[starting] : service name = '{ServiceName}'");
+            _log.WriteEntry($"[starting] : service name = '{ServiceName}'");
 
             _service.Start();
 
-            _log.WrinteEntry($"[started] : service name = '{ServiceName}'");
+            _log.WriteEntry($"[started] : service name = '{ServiceName}'");
         }
 
         protected override void OnStop()
         {
-            _log.WrinteEntry($"[stopping] : service name = '{ServiceName}'");
+            _log.WriteEntry($"[stopping] : service name = '{ServiceName}'");
 
             var stoppable = _service as IServiceHostStop;
 
@@ -58,7 +58,7 @@ namespace Shuttle.Core.ServiceHost
 
             disposable?.Dispose();
 
-            _log.WrinteEntry($"[stopped] : service name = '{ServiceName}'");
+            _log.WriteEntry($"[stopped] : service name = '{ServiceName}'");
         }
 
         public static void Run<T>() where T : IServiceHostStart, new()
@@ -115,7 +115,7 @@ namespace Shuttle.Core.ServiceHost
                 }
                 catch (Exception ex)
                 {
-                    GetServiceHostEventLog(configuration).WrinteEntry(ex.Message, EventLogEntryType.Error);
+                    GetServiceHostEventLog(configuration).WriteEntry(ex.Message, EventLogEntryType.Error);
                     throw;
                 }
             }
@@ -129,7 +129,7 @@ namespace Shuttle.Core.ServiceHost
                 }
                 catch (Exception ex)
                 {
-                    Log.For(typeof(ServiceHost)).Error(ex.Message);
+                    Log.For(typeof(ServiceHost)).Fatal(ex.Message);
                     throw;
                 }
             }

@@ -14,6 +14,13 @@
     <releaseNotes />
     <copyright>Copyright (c) {year}, Eben Roux</copyright>
     <tags>shuttle</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net46" />
+      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net461" />
+      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net462" />
+      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net47" />
+      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net471" />
+    </frameworkAssemblies>
     <dependencies>
       <dependency id="Shuttle.Core.Cli" version="{Shuttle.Core.Cli-version}" />
       <dependency id="Shuttle.Core.Logging" version="{Shuttle.Core.Logging-version}" />

@@ -1,36 +1,51 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net46;net461;net462;net47;net471</TargetFrameworks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net46;net461;net462;net47;net471;netstandard2.0;netcoreapp2.0</TargetFrameworks>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Content\Help.txt" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="Content\Help.txt" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Content\Help.txt" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Content\Help.txt" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Include=".build\package.msbuild" />
-    <None Include=".build\package.nuspec" />
-    <None Include=".build\Shuttle.MSBuild.dll" />
-    <None Include=".build\Shuttle.MSBuild.targets" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include=".build\package.msbuild" />
+        <None Include=".build\package.nuspec" />
+        <None Include=".build\Shuttle.MSBuild.dll" />
+        <None Include=".build\Shuttle.MSBuild.targets" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Shuttle.Core.Cli" Version="10.0.0" />
-    <PackageReference Include="Shuttle.Core.Logging" Version="10.0.1" />
-    <PackageReference Include="Shuttle.Core.Reflection" Version="10.0.6" />
-    <PackageReference Include="Shuttle.Core.Threading" Version="10.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Shuttle.Core.Cli" Version="10.0.0" />
+        <PackageReference Include="Shuttle.Core.Logging" Version="10.0.1" />
+        <PackageReference Include="Shuttle.Core.Reflection" Version="10.0.6" />
+        <PackageReference Include="Shuttle.Core.Threading" Version="10.0.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Configuration.Install" />
-    <Reference Include="System.ServiceProcess" />
-  </ItemGroup>
+    <ItemGroup>
+        <Reference Include="System.Configuration" Condition="'$(TargetFramework)' != 'netstandard2.0' and '$(TargetFramework)' != 'netcoreapp2.0'" />
+        <Reference Include="System.Configuration.Install" Condition="'$(TargetFramework)' != 'netstandard2.0' and '$(TargetFramework)' != 'netcoreapp2.0'" />
+        <Reference Include="System.ServiceProcess" Condition="'$(TargetFramework)' != 'netstandard2.0' and '$(TargetFramework)' != 'netcoreapp2.0'" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="ServiceHostInstaller.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="ServiceHostController.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="ServiceInvoker.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="ServiceHostSection.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="IServiceConfiguration.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="ServiceConfiguration.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="ServiceHostEventLog.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="ServiceHost.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="CommandProcessor.cs;WindowsServiceInstaller.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        <Compile Remove="WindowsServiceInstaller.cs" Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.0'" />
+        
+        <Compile Remove="ServiceHostCore.cs" Condition="'$(TargetFramework)' != 'netstandard2.0' and '$(TargetFramework)' != 'netcoreapp2.0'" />
+    </ItemGroup>
 
 </Project>

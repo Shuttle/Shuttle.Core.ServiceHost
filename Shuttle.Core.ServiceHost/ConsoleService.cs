@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Reflection;
+#if (!NETCOREAPP2_0 && !NETSTANDARD2_0)
 using System.Linq;
 using System.ServiceProcess;
+#endif
 using System.Threading;
 using Shuttle.Core.Contract;
 
@@ -9,6 +12,8 @@ namespace Shuttle.Core.ServiceHost
     public class ConsoleService
     {
         private readonly IServiceHostStart _service;
+
+#if (!NETCOREAPP2_0 && !NETSTANDARD2_0)
         private readonly IServiceConfiguration _configuration;
 
         public ConsoleService(IServiceHostStart service, IServiceConfiguration configuration)
@@ -16,12 +21,21 @@ namespace Shuttle.Core.ServiceHost
             Guard.AgainstNull(service, nameof(service));
             Guard.AgainstNull(configuration, nameof(configuration));
 
-            _service = service;
             _configuration = configuration;
+            _service = service;
         }
+#else
+        public ConsoleService(IServiceHostStart service)
+        {
+            Guard.AgainstNull(service, nameof(service));
+
+            _service = service;
+        }
+#endif
 
         public void Execute()
         {
+#if (!NETCOREAPP2_0 && !NETSTANDARD2_0)
             var serviceController =
                 ServiceController.GetServices()
                     .FirstOrDefault(s => s.ServiceName == _configuration.ServiceName);
@@ -32,6 +46,7 @@ namespace Shuttle.Core.ServiceHost
                     $"WARNING: Windows service '{_configuration.ServiceName}' is running.  The display name is '{serviceController.DisplayName}'.");
                 Console.WriteLine();
             }
+#endif
 
             var waitHandle = new ManualResetEvent(false);
             var waitHandles = new WaitHandle[] { waitHandle };
@@ -55,7 +70,11 @@ namespace Shuttle.Core.ServiceHost
             _service.Start();
 
             Console.WriteLine();
+#if (!NETCOREAPP2_0 && !NETSTANDARD2_0)
             ConsoleExtensions.WriteLine(ConsoleColor.Green, $"[started] : '{_configuration.ServiceName}'.");
+#else
+            ConsoleExtensions.WriteLine(ConsoleColor.Green, $"[started] : '{Assembly.GetEntryAssembly().FullName}'.");
+#endif
             Console.WriteLine();
             ConsoleExtensions.WriteLine(ConsoleColor.DarkYellow, "[press ctrl+c to stop]");
             Console.WriteLine();

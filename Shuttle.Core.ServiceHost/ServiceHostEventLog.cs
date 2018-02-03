@@ -39,12 +39,12 @@ namespace Shuttle.Core.ServiceHost
             return result;
         }
 
-        public void WrinteEntry(string message)
+        public void WriteEntry(string message)
         {
-            WrinteEntry(message, EventLogEntryType.Information);
+            WriteEntry(message, EventLogEntryType.Information);
         }
 
-        public void WrinteEntry(string message, EventLogEntryType type)
+        public void WriteEntry(string message, EventLogEntryType type)
         {
             _eventLog?.WriteEntry(message, type);
         }
