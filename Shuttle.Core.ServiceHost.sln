@@ -1,13 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shuttle.Core.ServiceHost", "Shuttle.Core.ServiceHost\Shuttle.Core.ServiceHost.csproj", "{C7FE2F45-044F-43F4-9314-4978586F8D30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shuttle.Core.ServiceHost", "Shuttle.Core.ServiceHost\Shuttle.Core.ServiceHost.csproj", "{C7FE2F45-044F-43F4-9314-4978586F8D30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shuttle.Core.ServiceHost.Tests", "Shuttle.Core.ServiceHost.Tests\Shuttle.Core.ServiceHost.Tests.csproj", "{55556C56-302F-4D9C-BA6E-C34D2EF205CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shuttle.Core.ServiceHost.Tests", "Shuttle.Core.ServiceHost.Tests\Shuttle.Core.ServiceHost.Tests.csproj", "{55556C56-302F-4D9C-BA6E-C34D2EF205CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shuttle.Core.ServiceHost.Server", "Shuttle.Core.ServiceHost.Server\Shuttle.Core.ServiceHost.Server.csproj", "{3D436CED-094D-4F08-B43E-B48EDCE60AB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shuttle.Core.ServiceHost.Server", "Shuttle.Core.ServiceHost.Server\Shuttle.Core.ServiceHost.Server.csproj", "{3D436CED-094D-4F08-B43E-B48EDCE60AB2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35FD8F01-FC32-4A68-8237-FDC3A5DADDA0}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
