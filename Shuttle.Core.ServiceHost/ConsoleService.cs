@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-#if (!NETCOREAPP2_0 && !NETSTANDARD2_0)
+#if (!NETCOREAPP2_0 && !NETCOREAPP2_1 && !NETSTANDARD2_0)
 using System.Linq;
 using System.ServiceProcess;
 #endif
@@ -13,7 +13,7 @@ namespace Shuttle.Core.ServiceHost
     {
         private readonly IServiceHostStart _service;
 
-#if (!NETCOREAPP2_0 && !NETSTANDARD2_0)
+#if (!NETCOREAPP2_0 && !NETCOREAPP2_1 && !NETSTANDARD2_0)
         private readonly IServiceConfiguration _configuration;
 
         public ConsoleService(IServiceHostStart service, IServiceConfiguration configuration)
@@ -35,7 +35,7 @@ namespace Shuttle.Core.ServiceHost
 
         public void Execute()
         {
-#if (!NETCOREAPP2_0 && !NETSTANDARD2_0)
+#if (!NETCOREAPP2_0 && !NETCOREAPP2_1 && !NETSTANDARD2_0)
             var serviceController =
                 ServiceController.GetServices()
                     .FirstOrDefault(s => s.ServiceName == _configuration.ServiceName);
@@ -70,7 +70,7 @@ namespace Shuttle.Core.ServiceHost
             _service.Start();
 
             Console.WriteLine();
-#if (!NETCOREAPP2_0 && !NETSTANDARD2_0)
+#if (!NETCOREAPP2_0 && !NETCOREAPP2_1 && !NETSTANDARD2_0)
             ConsoleExtensions.WriteLine(ConsoleColor.Green, $"[started] : '{_configuration.ServiceName}'.");
 #else
             ConsoleExtensions.WriteLine(ConsoleColor.Green, $"[started] : '{Assembly.GetEntryAssembly().FullName}'.");
