@@ -23,7 +23,7 @@
     <ItemGroup>
         <PackageReference Include="Shuttle.Core.Cli" Version="10.0.2" />
         <PackageReference Include="Shuttle.Core.Logging" Version="10.0.3" />
-        <PackageReference Include="Shuttle.Core.Reflection" Version="10.0.8" />
+        <PackageReference Include="Shuttle.Core.Reflection" Version="10.0.9" />
         <PackageReference Include="Shuttle.Core.Threading" Version="10.0.2" />
     </ItemGroup>
 
