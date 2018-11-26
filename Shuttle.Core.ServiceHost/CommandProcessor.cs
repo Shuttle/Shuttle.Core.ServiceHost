@@ -21,6 +21,7 @@ namespace Shuttle.Core.ServiceHost
             try
             {
                 var arguments = new Arguments(Environment.GetCommandLineArgs());
+                var action = arguments.CommandLine.Length > 1 ? arguments.CommandLine[1] : string.Empty;
 
                 configuration.WithArguments(arguments);
 
@@ -36,16 +37,16 @@ namespace Shuttle.Core.ServiceHost
                     Debugger.Launch();
                 }
 
-                var install = arguments.Get("install", string.Empty);
-                var uninstall = arguments.Get("uninstall", string.Empty);
+                var install = arguments.Contains("install") || action.Equals("install", StringComparison.InvariantCultureIgnoreCase);
+                var uninstall = arguments.Contains("uninstall") || action.Equals("uninstall", StringComparison.InvariantCultureIgnoreCase);
 
-                if (!string.IsNullOrEmpty(install) && !string.IsNullOrEmpty(uninstall))
+                if (install && uninstall)
                 {
                     throw new InstallException("Cannot specify /install and /uninstall together.");
                 }
 
-                var start = arguments.Get("start", string.Empty);
-                var stop = arguments.Get("stop", string.Empty);
+                var start = arguments.Contains("start") || action.Equals("start", StringComparison.InvariantCultureIgnoreCase); 
+                var stop = arguments.Contains("stop") || action.Equals("stop", StringComparison.InvariantCultureIgnoreCase); 
                 var timeoutValue = arguments.Get("timeout", "30000");
 
                 if (!int.TryParse(timeoutValue, out var timeout))
@@ -55,33 +56,30 @@ namespace Shuttle.Core.ServiceHost
 
                 configuration.WithTimeout(timeout);
 
-                if (!string.IsNullOrEmpty(uninstall))
+                if (uninstall)
                 {
                     new WindowsServiceInstaller().Uninstall(configuration);
 
                     result= true;
                 }
 
-                if (!string.IsNullOrEmpty(install))
+                if (install)
                 {
                     new WindowsServiceInstaller().Install(configuration);
 
                     result = true;
                 }
 
-                var shouldStop = !string.IsNullOrEmpty(stop);
-                var shouldStart = !string.IsNullOrEmpty(start);
-
-                if (shouldStop || shouldStart)
+                if (stop || start)
                 {
                     var controller = new ServiceHostController(configuration);
 
-                    if (shouldStop)
+                    if (stop)
                     {
                         controller.Stop();
                     }
 
-                    if (shouldStart)
+                    if (start)
                     {
                         controller.Start();
                     }

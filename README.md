@@ -105,32 +105,31 @@ You may also specify configuration using the following configuration which may, 
 The following command-line arguments are available and can be viewed by running `{your-console}.exe /?`:
 
 ```
-[/install [/serviceName]]	
+{your-console}.exe [[/]action]
+
+	[action]:
+	- install (installs the service)
+	- uninstall (uninstalls the service)
+	- start (starts the service)
+	- stop (stops the service)
+
+[/serviceName="the-service-name"]
 	- install the service
 		
-[/displayName]				
+[/displayName="display-name"]				
 	- friendly name for the installed service
 		
-[/description]				
+[/description="description"]				
 	- Description for the service
 		
-[/instance]					
+[/instance="instance-name"]
 	- unique name of the instance you wish to install
 		
-[/startMode]			
+[/startMode="start-mode"]
 	- specifies that the service start mode (Boot, System, Automatic, Manual, Disabled)
 		
-[/username /password]
+[/username="username" /password="password"]
 	- username and password of the account to use for the service
-- or -
-	
-[/uninstall [/serviceName] [/instance]]	
-
-[/start]
-	- starts the service instance
-
-[/stop]
-	- stops the service instance
 ```
 
 ### Service Name
@@ -141,13 +140,13 @@ If no `/serviceName` is specified the full name of the your console application 
 Namespace.ConsoleApplication (1.0.0.0)
 ```
 
-### Uninstall
+### Action
 
-If you set the `/serviceName` and/or `/instance` during installation you will need to specify them when uninstalling as well, e.g.:
+If you set the `/serviceName` and/or `/instance` during installation you will need to specify them when using the other actions also as well, e.g.:
 
 ```
 {your=console}.exe 
-	/uninstall 
+	uninstall|start|stop
 	/serviceName:"Shuttle.Application.Server" 
 	/instance:"Instance5"
 ```
@@ -156,7 +155,7 @@ If you set the `/serviceName` and/or `/instance` during installation you will ne
 
 ```
 {your=console}.exe 
-	/install 
+	install 
 	/serviceName:"Shuttle.Application.Server" 
 	/displayName:"Shuttle server for the application"
 	/description:"Service to handle messages relating to the application." 

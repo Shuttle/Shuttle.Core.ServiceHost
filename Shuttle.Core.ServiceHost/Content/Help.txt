@@ -1,57 +1,57 @@
-﻿Shuttle Service Host
+﻿Shuttle Core Service Host
 
-USAGE:
-	{console}.exe 
-		[/install [/serviceName]]	
-			- install the service
-			
-		[/displayName]				
-			- friendly name for the installed service
-			
-		[/description]				
-			- Description for the service
-			
-		[/instance]					
-			- unique name of the instance you wish to install
-			
-		[/startManually]			
-			- specifies that the service should start manually
-			
-		[/username]					
-			- username of the account to use for the service
-			
-		[/password]]				
-			- password of the account to use for the service
-			
-		- or -
+USAGE
+
+	{your-console}.exe [[/]action]
+
+		[action]:
+		- install (installs the service)
+		- uninstall (uninstalls the service)
+		- start (starts the service)
+		- stop (stops the service)
+
+	[/serviceName="the-service-name"]
+		- install the service
 		
-		[/uninstall [/serviceName] [/instance]]							
+	[/displayName="display-name"]				
+		- friendly name for the installed service
+		
+	[/description="description"]				
+		- Description for the service
+		
+	[/instance="instance-name"]
+		- unique name of the instance you wish to install
+		
+	[/startMode="start-mode"]
+		- specifies that the service start mode (Boot, System, Automatic, Manual, Disabled)
+		
+	[/username="username" /password="password"]
+		- username and password of the account to use for the service
 
-OVERVIEW:
 
-- Service Name -
-If no /serviceName is specified the full name of the console application will be used along with its version number.
-e.g.:
+SERVICE NAME
 
-	Shuttle.Application.Server.Host (1.0.0.0)
+If no `/serviceName` is specified the full name of the your console application along with the version number, e.g.:
 
-- Display Name -	
-The default for the /displayName is the same value as /serviceName.
+	Namespace.ConsoleApplication (1.0.0.0)
 
-- Uninstall -
-If you set the /serviceName and/or /instance during installation you will need 
-to specify them when uninstalling them as well, e.g.:
 
-	Shuttle.Core.Host.exe 
-		/uninstall 
+ACTION
+
+If you set the `/serviceName` and/or `/instance` during installation you will need to specify them when using the other actions also as well, e.g.:
+
+	{your=console}.exe 
+		uninstall|start|stop
 		/serviceName:"Shuttle.Application.Server" 
 		/instance:"Instance5"
-	
-- EXAMPLE -
-Shuttle.Core.Host.exe 
-	/install 
-	/serviceName:"Shuttle.Application.Server" 
-	/displayName:"Shuttle server for the application"
-	/description:"Service to handle messages relating to the application" 
-	/username:"domain\hostuser"
-	/password:"p@ssw0rd!"
+
+
+EXAMPLE
+
+	{your=console}.exe 
+		install 
+		/serviceName:"Shuttle.Application.Server" 
+		/displayName:"Shuttle server for the application"
+		/description:"Service to handle messages relating to the application." 
+		/username:"domain\hostuser"
+		/password:"p@ssw0rd!"
