@@ -6,7 +6,7 @@
     <version>{semver}</version>
     <authors>Eben Roux</authors>
     <owners>Eben Roux</owners>
-    <licenseUrl>https://github.com/shuttle/Shuttle.Core.ServiceHost/raw/master/LICENSE</licenseUrl>
+    <license type="expression">BSD-3-Clause</license>
     <projectUrl>https://github.com/shuttle/Shuttle.Core.ServiceHost</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Shuttle/Shuttle.Core.ServiceHost/master/.media/logo.png</iconUrl>
     <repository type="git" url="https://github.com/Shuttle/Shuttle.Core.ServiceHost.git" />
@@ -16,11 +16,7 @@
     <copyright>Copyright (c) {year}, Eben Roux</copyright>
     <tags>shuttle</tags>
     <frameworkAssemblies>
-      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net46" />
       <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net461" />
-      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net462" />
-      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net47" />
-      <frameworkAssembly assemblyName="System.ServiceProcess" targetFramework="net471" />
     </frameworkAssemblies>
     <dependencies>
       <dependency id="Shuttle.Core.Cli" version="{Shuttle.Core.Cli-version}" />

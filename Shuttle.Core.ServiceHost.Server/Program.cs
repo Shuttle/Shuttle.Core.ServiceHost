@@ -11,10 +11,10 @@ namespace Shuttle.Core.ServiceHost.Server
             ServiceHost.Run<TestHost>();
         }
 
-        public class TestHost : IServiceHost, IThreadState
+        public class TestHost : IServiceHost
         {
             private readonly Thread _thread;
-            private volatile bool _active;
+            private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
             public TestHost()
             {
@@ -23,24 +23,21 @@ namespace Shuttle.Core.ServiceHost.Server
 
             public void Start()
             {
-                _active = true;
                 _thread.Start();
             }
 
             public void Stop()
             {
-                _active = false;
+                _cancellationTokenSource.Cancel();
                 _thread.Join(5000);
             }
 
-            public bool Active => _active;
-
             private void Worker()
             {
-                while (_active)
+                while (!_cancellationTokenSource.IsCancellationRequested)
                 {
                     Console.WriteLine($"[working] : {DateTime.Now:O}");
-                    ThreadSleep.While(1000, this);
+                    ThreadSleep.While(1000, _cancellationTokenSource.Token);
                 }
             }
         }
