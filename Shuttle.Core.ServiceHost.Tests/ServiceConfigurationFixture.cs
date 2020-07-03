@@ -19,10 +19,11 @@ namespace Shuttle.Core.ServiceHost.Tests
                 .WithUsername("mr.resistor")
                 .WithPassword("ohm")
                 .WithStartMode(ServiceStartMode.Disabled)
+                .WithDelayedAutoStart()
                 .CommandLine();
 
             Assert.AreEqual(
-                "/serviceName=\"Server\" /instance=\"One\" /displayName=\"Server Display Name\" /description=\"Service Description\" /username=\"mr.resistor\" /password=\"ohm\" /startMode=\"Disabled\"",
+                "/serviceName=\"Server\" /instance=\"One\" /displayName=\"Server Display Name\" /description=\"Service Description\" /username=\"mr.resistor\" /password=\"ohm\" /startMode=\"Disabled\" /delayedAutoStart",
                 commandLine);
         }
 

@@ -14,6 +14,7 @@ namespace Shuttle.Core.ServiceHost
         string Description { get; }
         int Timeout { get; }
         ServiceStartMode StartMode { get; }
+        bool DelayedAutoStart { get; }
         IServiceConfiguration WithServiceName(string serviceName);
         IServiceConfiguration WithInstance(string instance);
         IServiceConfiguration WithServicePath(string path);
@@ -24,6 +25,7 @@ namespace Shuttle.Core.ServiceHost
         IServiceConfiguration WithStartMode(ServiceStartMode startMode);
         IServiceConfiguration WithArguments(Arguments arguments);
         IServiceConfiguration WithTimeout(int timeout);
+        IServiceConfiguration WithDelayedAutoStart();
         string GetInstancedServiceName();
         string CommandLine();
     }

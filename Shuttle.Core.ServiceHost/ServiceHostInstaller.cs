@@ -62,7 +62,8 @@ namespace Shuttle.Core.ServiceHost
                 DisplayName = configuration.DisplayName,
                 ServiceName = configuration.GetInstancedServiceName(),
                 Description = configuration.Description,
-                StartType = configuration.StartMode
+                StartType = configuration.StartMode,
+                DelayedAutoStart = configuration.DelayedAutoStart
             };
 
             Installers.Add(processInstaller);

@@ -21,6 +21,9 @@ namespace Shuttle.Core.ServiceHost
         [ConfigurationProperty("startMode", IsRequired = false, DefaultValue = ServiceStartMode.Automatic)]
         public ServiceStartMode StartMode => (ServiceStartMode)this["startMode"];
 
+        [ConfigurationProperty("delayedAutoStart", IsRequired = false, DefaultValue = false)]
+        public bool DelayedAutoStart => (bool)this["delayedAutoStart"];
+
         public static IServiceConfiguration Configuration()
         {
             var section = ConfigurationSectionProvider.Open<ServiceHostSection>("shuttle", "service");
@@ -46,6 +49,11 @@ namespace Shuttle.Core.ServiceHost
                 }
 
                 configuration.WithStartMode(section.StartMode);
+
+                if (section.DelayedAutoStart)
+                {
+                    configuration.WithDelayedAutoStart();
+                }
             }
 
             return configuration;

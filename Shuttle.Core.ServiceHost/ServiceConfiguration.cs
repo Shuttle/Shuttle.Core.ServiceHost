@@ -52,6 +52,8 @@ namespace Shuttle.Core.ServiceHost
         public string Instance { get; private set; }
         public string ServicePath { get; private set; }
 
+        public bool DelayedAutoStart { get; private set; }
+
         public IServiceConfiguration WithServiceName(string serviceName)
         {
             Guard.AgainstNullOrEmptyString(serviceName, nameof(serviceName));
@@ -157,6 +159,7 @@ namespace Shuttle.Core.ServiceHost
             _description = arguments.Get("Description", _description);
             Username = arguments.Get("Username", Username);
             Password = arguments.Get("Password", Password);
+            DelayedAutoStart = arguments.Contains("DelayedAutoStart");
 
             if (arguments.Contains("StartMode"))
             {
@@ -171,6 +174,13 @@ namespace Shuttle.Core.ServiceHost
                     throw new InvalidOperationException($"An invalid ServiceStartMode of '{value}' has been used to configure the service.");
                 }
             }
+
+            return this;
+        }
+
+        public IServiceConfiguration WithDelayedAutoStart()
+        {
+            DelayedAutoStart = true;
 
             return this;
         }
@@ -214,6 +224,11 @@ namespace Shuttle.Core.ServiceHost
             }
 
             result.Append($" /startMode=\"{StartMode}\"");
+
+            if (DelayedAutoStart)
+            {
+                result.Append($" /delayedAutoStart");
+            }
 
             return result.ToString();
         }

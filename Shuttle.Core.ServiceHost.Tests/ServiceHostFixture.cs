@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.ServiceProcess;
 using NUnit.Framework;
 
 namespace Shuttle.Core.ServiceHost.Tests
@@ -10,7 +11,7 @@ namespace Shuttle.Core.ServiceHost.Tests
     {
         private string GetServicePath()
         {
-            var servicePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\Shuttle.Core.ServiceHost.Server\bin\Debug\Shuttle.Core.ServiceHost.Server.exe");
+            var servicePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\Shuttle.Core.ServiceHost.Server\bin\Debug\net461\Shuttle.Core.ServiceHost.Server.exe");
 
             if (!File.Exists(servicePath))
             {
@@ -25,6 +26,8 @@ namespace Shuttle.Core.ServiceHost.Tests
         {
             new WindowsServiceInstaller().Install(new ServiceConfiguration()
                 .WithServiceName("Shuttle.Core.ServiceHost.Server")
+                .WithStartMode(ServiceStartMode.Automatic)
+                .WithDelayedAutoStart()
                 .WithServicePath(GetServicePath()));
         }
 
